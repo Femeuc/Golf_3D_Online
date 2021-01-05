@@ -1,35 +1,50 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using Photon.Pun;
 
-public class ThrowBall : MonoBehaviour
+namespace Com.Femeuc.Golf3DOnline
 {
-    #region Properties
-    private Rigidbody player;
-    private Camera cam;
-    #endregion
-
-    #region MonoBehaviour CallBacks
-    // Start is called before the first frame update
-    void Start()
+    public class ThrowBall : MonoBehaviourPun
     {
-        player = GameObject.Find("Player").GetComponent<Rigidbody>();
-        cam = Camera.main;
-    }
+        private static Rigidbody playerRigidBody;
+        private Camera cam;
+        bool isBeingThrown;
 
-    private void Update()
-    {
-        // Stops the ball when it gets slower than a certain velocity, this way the player doesn't have to 
-        // wait until the ball stops.
-        if(player.velocity.magnitude < .3)
+        // Start is called before the first frame update
+        void Start()
         {
-            player.velocity = Vector3.zero;
+            cam = Camera.main;
         }
-    }
-    #endregion
 
-    public void Throw()
-    {
-        // transform.forward = Returns a normalized vector representing the blue axis of the transform in world space.
-        // This way the force will be added to the z direction of the camera, which is forward
-        player.AddForce(cam.transform.forward * 500 + new Vector3(0, 1000, 0), ForceMode.Force);
+        // Update is called once per frame
+        void FixedUpdate()
+        {
+            stopWhenGoingTooSlowAfterBeingThrown();
+        }
+
+        public void Throw()
+        {
+            Debug.Log("Throwing " + PhotonNetwork.LocalPlayer.NickName);
+            playerRigidBody.velocity = cam.transform.forward * 15 + Vector3.up * 5;
+            isBeingThrown = true;
+        }
+
+        public static void InitializePlayerRigidBody()
+        {
+            playerRigidBody = CameraFollow.playerObject.GetComponent<Rigidbody>();
+        }
+
+        // This method stops the ball if it going too slow,
+        // this way you don't have to wait until the ball stops
+        private void stopWhenGoingTooSlowAfterBeingThrown()
+        {
+            if (!isBeingThrown) return;
+            if (!(playerRigidBody.velocity.magnitude < 1)) return;
+            Debug.Log("Stoping the ball");
+            playerRigidBody.velocity = Vector3.zero;
+            playerRigidBody.Sleep(); // This is necessary to make the ball stop altogether
+            isBeingThrown = false;
+        }
     }
 }
