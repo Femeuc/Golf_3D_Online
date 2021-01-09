@@ -26,7 +26,6 @@ namespace Com.Femeuc.Golf3DOnline
             if (!photonView.IsMine) return;
             cam = Camera.main;
             Debug.Log("this.gameObject is: " + this.gameObject.ToString());
-            //player = GameObject.Find("Player").GetComponent<PhotonView>();
             PhotonNetwork.LocalPlayer.NickName.ToString();
             playerObject = this.gameObject;
             ThrowBall.InitializePlayerRigidBody();
@@ -39,14 +38,14 @@ namespace Com.Femeuc.Golf3DOnline
         {
             if (!photonView.IsMine) return;
             cam.transform.position = targetOfCamera.position;
-            if (Input.GetMouseButtonDown(1))
+            if (Input.GetMouseButtonDown(0))
             {
                 // ScreenToViewportPoint(Vector3 position); Transforms position from screen space into viewport space.
                 // Screenspace is defined in pixels. The bottom-left of the screen is (0,0); the right-top is (pixelWidth,pixelHeight).
                 // Viewport space is relative to the camera. The bottom-left of the camera is (0, 0); the top-right is (1, 1). 
-                previousMousePosition = cam.ScreenToViewportPoint(Input.mousePosition);
+                previousMousePosition = cam.ScreenToViewportPoint(Input.mousePosition); // this line is important for it to feel better.
             }
-            if (Input.GetMouseButton(1)) // GetMouseButton(int button) Returns whether the given mouse button is held down.
+            if (Input.GetMouseButton(0)) // GetMouseButton(int button) Returns whether the given mouse button is held down.
             {
                 Vector3 rotationDirection = previousMousePosition - cam.ScreenToViewportPoint(Input.mousePosition);
 
