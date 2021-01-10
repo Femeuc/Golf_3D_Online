@@ -72,10 +72,6 @@ namespace Com.Femeuc.Golf3DOnline
                 }
                 Debug.Log(playerRigidBody.velocity.magnitude);
             }
-            if(magnitude == 0)
-            {
-                Debug.Log("PARADO!");
-            }
         }
     }
 }
