@@ -56,7 +56,7 @@ namespace Com.Femeuc.Golf3DOnline
         public override void OnJoinedRoom()
         {
             Debug.Log("PUN Basics Tutorial/Launcher: OnJoinedRoom() called by PUN. Now this client is in a room.");
-            PhotonNetwork.LoadLevel("Room");
+            PhotonNetwork.LoadLevel("SampleScene");
         }
 
         public void Connect()
