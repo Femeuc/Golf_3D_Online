@@ -58,11 +58,11 @@ namespace Com.Femeuc.Golf3DOnline
             {
                 // Notice the amount of friction is dependant on the velocity.
                 if (magnitude > 30)
-                    playerRigidBody.AddForce(playerRigidBody.velocity * -0.025f * baseFramerate);
+                    playerRigidBody.AddForce(playerRigidBody.velocity * -0.02f * baseFramerate);
                 else if (magnitude > 10)
-                    playerRigidBody.AddForce(playerRigidBody.velocity * -0.05f * baseFramerate);
-                else if(magnitude > 1)
                     playerRigidBody.AddForce(playerRigidBody.velocity * -0.15f * baseFramerate);
+                else if(magnitude > 1)
+                    playerRigidBody.AddForce(playerRigidBody.velocity * -0.3f * baseFramerate);
                 else if (magnitude > 0.5)
                     playerRigidBody.AddForce(playerRigidBody.velocity * -0.5f * baseFramerate);
                 else
