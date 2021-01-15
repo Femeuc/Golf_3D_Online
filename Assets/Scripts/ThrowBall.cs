@@ -1,9 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using Photon.Pun;
 using UnityEngine.UI;
-using System;
 
 namespace Com.Femeuc.Golf3DOnline
 {
@@ -12,7 +9,7 @@ namespace Com.Femeuc.Golf3DOnline
         private static Rigidbody playerRigidBody;
         private Camera cam;
         public static Scrollbar forwardForceIntensity, upwardForceIntensity;
-        
+        private float previousBallVelocity;
 
         // Start is called before the first frame update
         void Start()    
@@ -25,8 +22,8 @@ namespace Com.Femeuc.Golf3DOnline
         // Update is called once per frame
         void FixedUpdate()
         {
-            causeFriction(); // Method responsible for causing the friction between ball and ground.
-        }                    // I prefer making my own function than using Rigidbody drag, cause it doesn't look good to me.
+           manageFriction(); 
+        }                    
 
         public void Throw()
         {
@@ -35,8 +32,6 @@ namespace Com.Femeuc.Golf3DOnline
             int upwardThrowValue = int.Parse((upwardForceIntensity.value * 10).ToString("0"));
             // Quarternion.Euler is necessary so the ball is thorwn only forward, not upward, even if the camera is pointing upward.
             playerRigidBody.velocity = Quaternion.Euler(0, cam.transform.rotation.eulerAngles.y, 0) * Vector3.forward * forwardThrowValue * forwardThrowValue / 3 + Vector3.up * upwardThrowValue * upwardThrowValue / 3;
-            Vector3 v3 = Quaternion.Euler(0, cam.transform.rotation.eulerAngles.y, 0) * Vector3.forward;
-
         }
 
         public static void InitializePlayerRigidBody()
@@ -44,34 +39,24 @@ namespace Com.Femeuc.Golf3DOnline
             playerRigidBody = CameraFollow.playerObject.GetComponent<Rigidbody>();
         }
 
-        // This function causes friction while the ball is rolling on the ground.
-        private void causeFriction()
+        private void manageFriction()
         {
-            if(playerRigidBody == null)
-            {
-                Debug.Log("Rigidbody null: leaving");
+            if (playerRigidBody == null) // If the playerRigidBody hasn't been instantiated yet
                 return;
-            }
-            float baseFramerate = Time.deltaTime * 60;
-            float magnitude = playerRigidBody.velocity.magnitude;
-            if (magnitude > 0 && playerRigidBody.velocity.y == 0) // only if ball is touching ground
+
+            float currentVelocity = playerRigidBody.velocity.magnitude;
+
+            if (PlayerCollision.isTouchingTheGround)
             {
-                // Notice the amount of friction is dependant on the velocity.
-                if (magnitude > 30)
-                    playerRigidBody.AddForce(playerRigidBody.velocity * -0.02f * baseFramerate);
-                else if (magnitude > 10)
-                    playerRigidBody.AddForce(playerRigidBody.velocity * -0.15f * baseFramerate);
-                else if(magnitude > 1)
-                    playerRigidBody.AddForce(playerRigidBody.velocity * -0.3f * baseFramerate);
-                else if (magnitude > 0.5)
-                    playerRigidBody.AddForce(playerRigidBody.velocity * -0.5f * baseFramerate);
-                else
-                {
-                    playerRigidBody.velocity = Vector3.zero;
-                    playerRigidBody.Sleep(); // This is necessary to make the ball stop altogether
-                }
-                Debug.Log(playerRigidBody.velocity.magnitude);
+                playerRigidBody.drag = 1 / playerRigidBody.velocity.magnitude; // As ball slows down, drag increases up to infinity
             }
+            else
+                playerRigidBody.drag = 0.01f;
+           
+            Debug.Log("Magnitude: " + playerRigidBody.velocity.magnitude);
+
+            previousBallVelocity = currentVelocity;
+
         }
     }
 }
